@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stopwatch Test</title>
+  <style>
+    body { background: #282731; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;}
+    .frame { background: #23232b; border-radius: 50%; width: 280px; height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 40px #1de9b6a0;}
+    .time { color: #ff415c; font-size: 2.5rem; font-family: monospace; margin-bottom: 20px;}
+    button { margin: 0 10px; padding: 10px 24px; border-radius: 15px; border: none; background: #ff415c; color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer;}
+    button:active { background: #1de9b6;}
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="time" id="display">00:00:00.00</div>
+    <div>
+      <button id="startStop">Start</button>
+      <button id="reset" disabled>Reset</button>
+    </div>
+  </div>
+  <script>
+    let startTime = null, elapsed = 0, running = false, timerId = null;
+    const display = document.getElementById('display');
+    const startStopBtn = document.getElementById('startStop');
+    const resetBtn = document.getElementById('reset');
+    function formatTime(ms) {
+      let cs = Math.floor((ms % 1000) / 10), s = Math.floor(ms / 1000) % 60, m = Math.floor(ms / 60000) % 60, h = Math.floor(ms / 3600000);
+      return `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}.${cs<10?'0':''}${cs}`;
+    }
+    function updateDisplay() {
+      let diff = running ? Date.now() - startTime + elapsed : elapsed;
+      display.textContent = formatTime(diff);
+    }
+    function startStop() {
+      if (!running) {
+        running = true; startTime = Date.now(); timerId = setInterval(updateDisplay, 10); startStopBtn.textContent = "Stop"; resetBtn.disabled = false;
+      } else {
+        running = false; elapsed += Date.now() - startTime; clearInterval(timerId); startStopBtn.textContent = "Start";
+      }
+    }
+    function reset() {
+      running = false; elapsed = 0; startTime = null; clearInterval(timerId); display.textContent = "00:00:00.00"; startStopBtn.textContent = "Start"; resetBtn.disabled = true;
+    }
+    startStopBtn.onclick = startStop; resetBtn.onclick = reset; updateDisplay();
+  </script>
+</body>
+</html>
